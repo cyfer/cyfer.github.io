@@ -4,7 +4,7 @@
     "client_uri": "https://www.cyfertek.com/bskyposter/",
     "application_type": "native",
     "redirect_uris": [
-       "bskyposter://oauth2redirect"
+       "cyfertek://oauth2redirect"
     ],
     "response_types": [
       "code"
