@@ -1,0 +1,19 @@
+{
+    "client_id": "https://www.cyfertek.com/bskyposter/oauth/client-metadata.json",
+    "client_name": "BskyPoster",
+    "client_uri": "https://www.cyfertek.com/bskyposter/",
+    "application_type": "native",
+    "redirect_uris": [
+       "bskyposter://oauth2redirect"
+    ],
+    "response_types": [
+      "code"
+    ],
+    "grant_types": [
+      "authorization_code",
+      "refresh_token"
+    ],
+    "scope": "atproto transition:generic transition:chat.bsky",
+    "token_endpoint_auth_method": "none",
+    "dpop_bound_access_tokens": true
+  }
