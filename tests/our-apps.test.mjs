@@ -51,6 +51,10 @@ test("Our Apps appears between the introduction and Services", () => {
   assert.match(html, /<article class="home-app-card">/);
 });
 
+test("the page requests the current version of the home-page stylesheet", () => {
+  assert.match(html, /<link href="\.\/index\.css\?v=83112c5d" rel="stylesheet" \/>/);
+});
+
 test("Transcribee uses the approved copy and feature highlights", () => {
   const requiredCopy = [
     "OUR APPS",
