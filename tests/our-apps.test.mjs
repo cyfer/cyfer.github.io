@@ -88,3 +88,29 @@ test("Marketplace links are external, safe, and accessible", () => {
   assert.match(googleLink, /src="public\/google-play-badge\.png"/);
   assert.match(appleLink, /src="public\/app-store-badge\.svg"/);
 });
+
+const css = readFileSync(projectFile("index.css"), "utf8");
+
+test("Our Apps has desktop, responsive, and focus styles", () => {
+  const requiredSelectors = [
+    ".home-apps {",
+    ".home-apps-header {",
+    ".home-apps-grid {",
+    ".home-app-card {",
+    ".home-app-artwork {",
+    ".home-app-image {",
+    ".home-app-details {",
+    ".home-app-features {",
+    ".home-app-links {",
+    ".home-store-link:focus-visible {",
+    ".home-store-badge {",
+  ];
+
+  for (const selector of requiredSelectors) {
+    assert.ok(css.includes(selector), `Missing CSS selector: ${selector}`);
+  }
+
+  assert.match(css, /@media\(max-width: 991px\)[\s\S]*\.home-app-card \{[\s\S]*?grid-template-columns: 1fr;/);
+  assert.match(css, /@media\(max-width: 767px\)[\s\S]*\.home-app-features \{[\s\S]*?grid-template-columns: 1fr;/);
+  assert.match(css, /@media\(max-width: 479px\)[\s\S]*\.home-app-links \{[\s\S]*?flex-direction: column;/);
+});
