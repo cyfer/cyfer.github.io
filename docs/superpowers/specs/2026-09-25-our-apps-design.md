@@ -33,7 +33,7 @@ Lead:
 
 Description:
 
-> Turn speech into accurate transcripts and useful AI summaries in more than 90 languages. Subscribers also get live transcription and translation, powered by AssemblyAI. New users receive 60 free transcription minutes.
+> Turn audio and video into accurate transcripts and useful summaries in more than 90 languages.
 
 Feature highlights:
 
