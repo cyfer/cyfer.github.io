@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
@@ -52,7 +53,13 @@ test("Our Apps appears between the introduction and Services", () => {
 });
 
 test("the page requests the current version of the home-page stylesheet", () => {
-  assert.match(html, /<link href="\.\/index\.css\?v=83112c5d" rel="stylesheet" \/>/);
+  const currentCss = readFileSync(projectFile("index.css"));
+  const cssVersion = createHash("sha256").update(currentCss).digest("hex").slice(0, 8);
+
+  assert.match(
+    html,
+    new RegExp(`<link href="\\.\\/index\\.css\\?v=${cssVersion}" rel="stylesheet" \\/>`),
+  );
 });
 
 test("Transcribee uses the approved copy and feature highlights", () => {
