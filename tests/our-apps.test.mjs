@@ -285,6 +285,7 @@ test("mobile keeps its typography and uses tighter vertical spacing", () => {
   assertBlockDeclarations(".service-description1 {", ["font-size: 14px;", "line-height: 21px;"], secondServiceTablet);
   assertBlockDeclarations(".home-header2 {", ["padding-bottom: 64px;"], mobile);
   assertBlockDeclarations(".home-store-badge {", ["height: 48px;"], mobile);
+  assertBlockDeclarations(".home-app-artwork-link,", ["max-width: 420px;"], tablet);
 });
 
 test("Our Apps has desktop, responsive, and focus styles", () => {
@@ -294,9 +295,13 @@ test("Our Apps has desktop, responsive, and focus styles", () => {
     ".home-apps-grid {",
     ".home-app-card {",
     ".home-app-artwork {",
+    ".home-app-artwork-link {",
+    ".home-app-artwork-link:hover,",
+    ".home-app-artwork-link:focus-visible,",
     ".home-app-image {",
     ".home-app-details {",
     ".home-app-features {",
+    ".home-app-learn-more {",
     ".home-app-links {",
     ".home-store-link:focus-visible {",
     ".home-store-badge {",
@@ -305,6 +310,25 @@ test("Our Apps has desktop, responsive, and focus styles", () => {
   for (const selector of requiredSelectors) {
     assert.ok(css.includes(selector), `Missing CSS selector: ${selector}`);
   }
+
+  assertDeclarations(".home-app-artwork-link {", [
+    "display: inline-flex;",
+    "width: 100%;",
+    "max-width: 460px;",
+    "transition: opacity 0.3s;",
+  ]);
+  assertDeclarations(".home-app-artwork-link:hover,", ["opacity: 0.65;"]);
+  assertDeclarations(".home-app-artwork-link:focus-visible,", [
+    "outline: 3px solid #235536;",
+    "outline-offset: 4px;",
+  ]);
+  assertDeclarations(".home-app-learn-more {", [
+    "color: #151515;",
+    "font-size: 16px;",
+    "line-height: 26px;",
+    "text-decoration: underline;",
+    "text-underline-offset: 4px;",
+  ]);
 
   assert.match(css, /@media\(max-width: 991px\)[\s\S]*\.home-app-card \{[\s\S]*?grid-template-columns: 1fr;/);
   assert.match(css, /@media\(max-width: 767px\)[\s\S]*\.home-app-features \{[\s\S]*?grid-template-columns: 1fr;/);
