@@ -27,6 +27,7 @@ test("Transcribee and marketplace assets are stored locally", () => {
 
 const html = readFileSync(projectFile("index.html"), "utf8");
 const normalizedHtml = html.replace(/\s+/g, " ");
+const transcribeeUrl = "https://transcribee.app";
 const googlePlayUrl =
   "https://play.google.com/store/apps/details?id=com.cyfertek.aitranscribe";
 const appStoreUrl =
@@ -80,6 +81,34 @@ test("Transcribee uses the approved copy and feature highlights", () => {
 
   assert.ok(!html.includes("More apps coming soon"));
   assert.match(html, /src="public\/transcribee\.png"\s+alt="Transcribee logo"/);
+});
+
+test("Transcribee artwork and Learn more link to its website", () => {
+  const escapedUrl = transcribeeUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const landingLinks = [
+    ...html.matchAll(new RegExp(`<a[^>]*href="${escapedUrl}"[^>]*>[\\s\\S]*?<\\/a>`, "g")),
+  ].map(([link]) => link);
+
+  assert.equal(landingLinks.length, 2, "Expected exactly two Transcribee website links");
+
+  const artworkLink = landingLinks.find((link) =>
+    link.includes('class="home-app-artwork-link"'),
+  );
+  const learnMoreLink = landingLinks.find((link) =>
+    link.includes('class="home-app-learn-more"'),
+  );
+
+  assert.notEqual(artworkLink, undefined, "Transcribee artwork link is missing");
+  assert.notEqual(learnMoreLink, undefined, "Transcribee Learn more link is missing");
+
+  for (const link of landingLinks) {
+    assert.match(link, /target="_blank"/);
+    assert.match(link, /rel="noopener noreferrer"/);
+  }
+
+  assert.match(artworkLink, /aria-label="Visit the Transcribee website"/);
+  assert.match(artworkLink, /src="public\/transcribee\.png"/);
+  assert.match(learnMoreLink, />\s*Learn more\s*<\/a>/);
 });
 
 test("Marketplace links are external, safe, and accessible", () => {
