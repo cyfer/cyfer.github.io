@@ -165,6 +165,61 @@ test("desktop homepage uses the approved compact scale", () => {
   assertDeclarations(".home-value {", ["font-size: 24px;", "line-height: 36px;"]);
 });
 
+test("mobile keeps its typography and uses tighter vertical spacing", () => {
+  const firstServiceTablet = css.indexOf("@media(max-width: 991px)");
+  const secondServiceTablet = css.indexOf("@media(max-width: 991px)", firstServiceTablet + 1);
+  const tablet = css.indexOf("@media(max-width: 991px)", css.indexOf(".home-container"));
+  const mobile = css.indexOf("@media(max-width: 767px)");
+
+  assert.ok(firstServiceTablet >= 0, "Missing first service 991px media query");
+  assert.ok(secondServiceTablet >= 0, "Missing second service 991px media query");
+  assert.ok(tablet >= 0, "Missing homepage 991px media query");
+  assert.ok(mobile >= 0, "Missing 767px media query");
+
+  assertDeclarations(".home-header2 {", ["padding-bottom: 64px;"], tablet);
+  assertDeclarations(".home-title1 {", ["font-size: 40px;", "line-height: 36px;"], tablet);
+  assertDeclarations(".home-description1 {", ["font-size: 16px;", "line-height: 24px;"], tablet);
+  assertDeclarations(".home-description2 {", [
+    "margin-top: var(--dl-space-space-twounits);",
+    "padding-top: var(--dl-space-space-twounits);",
+    "padding-bottom: var(--dl-space-space-threeunits);",
+  ], tablet);
+  assertDeclarations(".home-text8 {", ["font-size: 18px;", "line-height: 27px;"], tablet);
+  assertDeclarations(".home-apps {", [
+    "gap: var(--dl-space-space-twounits);",
+    "padding-bottom: 40px;",
+  ], tablet);
+  assertDeclarations(".home-apps-header {", [
+    "padding-top: var(--dl-space-space-twounits);",
+    "padding-bottom: var(--dl-space-space-unit);",
+  ], tablet);
+  assertDeclarations(".home-apps .heading,", ["font-size: 30px;", "line-height: 27px;"], tablet);
+  assertDeclarations(".home-app-artwork,", ["padding: var(--dl-space-space-oneandhalfunits);"], tablet);
+  assertDeclarations(".home-app-name {", ["font-size: 24px;", "line-height: 24px;"], tablet);
+  assertDeclarations(".home-app-lead {", ["font-size: 24px;", "line-height: 32px;"], tablet);
+  assertDeclarations(".home-app-description {", ["font-size: 16px;", "line-height: 24px;"], tablet);
+  assertDeclarations(".home-app-feature {", ["font-size: 14px;", "line-height: 21px;"], tablet);
+  assertDeclarations(".home-store-badge {", ["height: 54px;"], tablet);
+  assertDeclarations(".home-services {", [
+    "gap: var(--dl-space-space-twounits);",
+    "padding-bottom: 40px;",
+  ], tablet);
+  assertDeclarations(".home-header3 {", [
+    "padding-top: var(--dl-space-space-twounits);",
+    "padding-bottom: var(--dl-space-space-unit);",
+  ], tablet);
+  assertDeclarations(".home-information {", [
+    "padding-top: var(--dl-space-space-twounits);",
+    "padding-bottom: var(--dl-space-space-twounits);",
+  ], tablet);
+  assertDeclarations(".service-title {", ["font-size: 18px;", "line-height: 16px;"], firstServiceTablet);
+  assertDeclarations(".service-description {", ["font-size: 14px;", "line-height: 21px;"], firstServiceTablet);
+  assertDeclarations(".service-title1 {", ["font-size: 18px;", "line-height: 16px;"], secondServiceTablet);
+  assertDeclarations(".service-description1 {", ["font-size: 14px;", "line-height: 21px;"], secondServiceTablet);
+  assertDeclarations(".home-header2 {", ["padding-bottom: 64px;"], mobile);
+  assertDeclarations(".home-store-badge {", ["height: 48px;"], mobile);
+});
+
 test("Our Apps has desktop, responsive, and focus styles", () => {
   const requiredSelectors = [
     ".home-apps {",
