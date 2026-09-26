@@ -95,6 +95,76 @@ test("Marketplace links are external, safe, and accessible", () => {
 
 const css = readFileSync(projectFile("index.css"), "utf8");
 
+const ruleBody = (selector, startAt = 0) => {
+  const selectorPosition = css.indexOf(selector, startAt);
+  assert.ok(selectorPosition >= 0, `Missing CSS selector: ${selector}`);
+
+  const bodyStart = css.indexOf("{", selectorPosition) + 1;
+  return css.slice(bodyStart, css.indexOf("}", bodyStart));
+};
+
+const assertDeclarations = (selector, declarations, startAt = 0) => {
+  const body = ruleBody(selector, startAt);
+
+  for (const declaration of declarations) {
+    assert.ok(body.includes(declaration), `${selector} is missing ${declaration}`);
+  }
+};
+
+test("desktop homepage uses the approved compact scale", () => {
+  assertDeclarations(".service-service {", [
+    "gap: var(--dl-space-space-oneandhalfunits);",
+    "padding-bottom: var(--dl-space-space-twounits);",
+  ]);
+  assertDeclarations(".service-title {", ["font-size: 30px;", "line-height: 30px;"]);
+  assertDeclarations(".service-description {", ["font-size: 16px;", "line-height: 28px;"]);
+  assertDeclarations(".service-service1 {", [
+    "gap: var(--dl-space-space-oneandhalfunits);",
+    "padding-bottom: var(--dl-space-space-twounits);",
+  ]);
+  assertDeclarations(".service-title1 {", ["font-size: 30px;", "line-height: 30px;"]);
+  assertDeclarations(".service-description1 {", ["font-size: 16px;", "line-height: 28px;"]);
+  assertDeclarations(".home-navbar-interactive {", ["padding-top: 20px;"]);
+  assertDeclarations(".home-header2 {", ["padding-top: 64px;", "padding-bottom: 96px;"]);
+  assertDeclarations(".home-title1 {", ["font-size: 88px;", "line-height: 82px;"]);
+  assertDeclarations(".home-description1 {", ["font-size: 20px;", "line-height: 30px;"]);
+  assertDeclarations(".home-description2 {", [
+    "margin-top: var(--dl-space-space-threeunits);",
+    "padding-top: var(--dl-space-space-threeunits);",
+    "padding-bottom: 72px;",
+  ]);
+  assertDeclarations(".home-text8 {", ["font-size: 24px;", "line-height: 36px;"]);
+  assertDeclarations(".home-apps {", [
+    "gap: var(--dl-space-space-threeunits);",
+    "padding-top: 72px;",
+    "padding-bottom: 72px;",
+  ]);
+  assertDeclarations(".home-apps-header {", ["padding-bottom: var(--dl-space-space-twounits);"]);
+  assertDeclarations(".home-apps .heading,", ["font-size: 56px;", "line-height: 52px;"]);
+  assertDeclarations(".home-app-artwork {", [
+    "min-height: 380px;",
+    "padding: var(--dl-space-space-twounits);",
+  ]);
+  assertDeclarations(".home-app-details {", ["gap: 24px;", "padding: 40px;"]);
+  assertDeclarations(".home-app-name {", ["font-size: 30px;", "line-height: 30px;"]);
+  assertDeclarations(".home-app-lead {", ["font-size: 24px;", "line-height: 32px;"]);
+  assertDeclarations(".home-app-description {", ["font-size: 16px;", "line-height: 26px;"]);
+  assertDeclarations(".home-app-feature {", ["font-size: 14px;", "line-height: 21px;"]);
+  assertDeclarations(".home-store-badge {", ["height: 46px;"]);
+  assertDeclarations(".home-services {", [
+    "gap: var(--dl-space-space-threeunits);",
+    "padding-top: 72px;",
+    "padding-bottom: 72px;",
+  ]);
+  assertDeclarations(".home-header3 {", ["padding-bottom: var(--dl-space-space-twounits);"]);
+  assertDeclarations(".home-information {", [
+    "padding-top: var(--dl-space-space-threeunits);",
+    "padding-bottom: var(--dl-space-space-threeunits);",
+  ]);
+  assertDeclarations(".home-logo3 {", ["width: 72px;", "height: 72px;"]);
+  assertDeclarations(".home-value {", ["font-size: 24px;", "line-height: 36px;"]);
+});
+
 test("Our Apps has desktop, responsive, and focus styles", () => {
   const requiredSelectors = [
     ".home-apps {",
