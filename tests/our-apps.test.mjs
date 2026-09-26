@@ -102,21 +102,52 @@ test("Marketplace links are external, safe, and accessible", () => {
 
 const css = readFileSync(projectFile("index.css"), "utf8");
 
-const ruleBody = (selector, startAt = 0) => {
+const ruleBody = (selector, startAt = 0, endAt = css.length) => {
   const selectorPosition = css.indexOf(selector, startAt);
-  assert.ok(selectorPosition >= 0, `Missing CSS selector: ${selector}`);
+  assert.ok(
+    selectorPosition >= 0 && selectorPosition < endAt,
+    `Missing CSS selector in range: ${selector}`,
+  );
 
   const bodyStart = css.indexOf("{", selectorPosition) + 1;
   return css.slice(bodyStart, css.indexOf("}", bodyStart));
 };
 
-const assertDeclarations = (selector, declarations, startAt = 0) => {
-  const body = ruleBody(selector, startAt);
+const assertDeclarations = (selector, declarations, startAt = 0, endAt = css.length) => {
+  const body = ruleBody(selector, startAt, endAt);
 
   for (const declaration of declarations) {
     assert.ok(body.includes(declaration), `${selector} is missing ${declaration}`);
   }
 };
+
+const blockEnd = (startAt) => {
+  const bodyStart = css.indexOf("{", startAt);
+  assert.ok(bodyStart >= 0, `Missing CSS block at offset ${startAt}`);
+
+  let depth = 1;
+  for (let position = bodyStart + 1; position < css.length; position += 1) {
+    if (css[position] === "{") depth += 1;
+    if (css[position] === "}") depth -= 1;
+    if (depth === 0) return position;
+  }
+
+  assert.fail(`Unclosed CSS block at offset ${startAt}`);
+};
+
+const assertBlockDeclarations = (selector, declarations, blockStart) => {
+  assertDeclarations(selector, declarations, blockStart, blockEnd(blockStart));
+};
+
+test("CSS declaration checks stay within the requested range", () => {
+  const tablet = css.indexOf("@media(max-width: 991px)", css.indexOf(".home-container"));
+  const mobile = css.indexOf("@media(max-width: 767px)");
+
+  assert.throws(
+    () => ruleBody(".home-app-features {", tablet, mobile),
+    /Missing CSS selector in range/,
+  );
+});
 
 test("desktop homepage uses the approved compact scale", () => {
   assertDeclarations(".service-service {", [
@@ -183,48 +214,48 @@ test("mobile keeps its typography and uses tighter vertical spacing", () => {
   assert.ok(tablet >= 0, "Missing homepage 991px media query");
   assert.ok(mobile >= 0, "Missing 767px media query");
 
-  assertDeclarations(".home-header2 {", ["padding-bottom: 64px;"], tablet);
-  assertDeclarations(".home-title1 {", ["font-size: 40px;", "line-height: 36px;"], tablet);
-  assertDeclarations(".home-description1 {", ["font-size: 16px;", "line-height: 24px;"], tablet);
-  assertDeclarations(".home-description2 {", [
+  assertBlockDeclarations(".home-header2 {", ["padding-bottom: 64px;"], tablet);
+  assertBlockDeclarations(".home-title1 {", ["font-size: 40px;", "line-height: 36px;"], tablet);
+  assertBlockDeclarations(".home-description1 {", ["font-size: 16px;", "line-height: 24px;"], tablet);
+  assertBlockDeclarations(".home-description2 {", [
     "margin-top: var(--dl-space-space-twounits);",
     "padding-top: var(--dl-space-space-twounits);",
     "padding-bottom: var(--dl-space-space-threeunits);",
   ], tablet);
-  assertDeclarations(".home-text8 {", ["font-size: 18px;", "line-height: 27px;"], tablet);
-  assertDeclarations(".home-apps {", [
+  assertBlockDeclarations(".home-text8 {", ["font-size: 18px;", "line-height: 27px;"], tablet);
+  assertBlockDeclarations(".home-apps {", [
     "gap: var(--dl-space-space-twounits);",
     "padding-bottom: 40px;",
   ], tablet);
-  assertDeclarations(".home-apps-header {", [
+  assertBlockDeclarations(".home-apps-header {", [
     "padding-top: var(--dl-space-space-twounits);",
     "padding-bottom: var(--dl-space-space-unit);",
   ], tablet);
-  assertDeclarations(".home-apps .heading,", ["font-size: 30px;", "line-height: 27px;"], tablet);
-  assertDeclarations(".home-app-artwork,", ["padding: var(--dl-space-space-oneandhalfunits);"], tablet);
-  assertDeclarations(".home-app-name {", ["font-size: 24px;", "line-height: 24px;"], tablet);
-  assertDeclarations(".home-app-lead {", ["font-size: 24px;", "line-height: 32px;"], tablet);
-  assertDeclarations(".home-app-description {", ["font-size: 16px;", "line-height: 24px;"], tablet);
-  assertDeclarations(".home-app-feature {", ["font-size: 14px;", "line-height: 21px;"], tablet);
-  assertDeclarations(".home-store-badge {", ["height: 54px;"], tablet);
-  assertDeclarations(".home-services {", [
+  assertBlockDeclarations(".home-apps .heading,", ["font-size: 30px;", "line-height: 27px;"], tablet);
+  assertBlockDeclarations(".home-app-artwork,", ["padding: var(--dl-space-space-oneandhalfunits);"], tablet);
+  assertBlockDeclarations(".home-app-name {", ["font-size: 24px;", "line-height: 24px;"], tablet);
+  assertBlockDeclarations(".home-app-lead {", ["font-size: 24px;", "line-height: 32px;"], tablet);
+  assertBlockDeclarations(".home-app-description {", ["font-size: 16px;", "line-height: 24px;"], tablet);
+  assertBlockDeclarations(".home-app-feature {", ["font-size: 14px;", "line-height: 21px;"], tablet);
+  assertBlockDeclarations(".home-store-badge {", ["height: 54px;"], tablet);
+  assertBlockDeclarations(".home-services {", [
     "gap: var(--dl-space-space-twounits);",
     "padding-bottom: 40px;",
   ], tablet);
-  assertDeclarations(".home-header3 {", [
+  assertBlockDeclarations(".home-header3 {", [
     "padding-top: var(--dl-space-space-twounits);",
     "padding-bottom: var(--dl-space-space-unit);",
   ], tablet);
-  assertDeclarations(".home-information {", [
+  assertBlockDeclarations(".home-information {", [
     "padding-top: var(--dl-space-space-twounits);",
     "padding-bottom: var(--dl-space-space-twounits);",
   ], tablet);
-  assertDeclarations(".service-title {", ["font-size: 18px;", "line-height: 16px;"], firstServiceTablet);
-  assertDeclarations(".service-description {", ["font-size: 14px;", "line-height: 21px;"], firstServiceTablet);
-  assertDeclarations(".service-title1 {", ["font-size: 18px;", "line-height: 16px;"], secondServiceTablet);
-  assertDeclarations(".service-description1 {", ["font-size: 14px;", "line-height: 21px;"], secondServiceTablet);
-  assertDeclarations(".home-header2 {", ["padding-bottom: 64px;"], mobile);
-  assertDeclarations(".home-store-badge {", ["height: 48px;"], mobile);
+  assertBlockDeclarations(".service-title {", ["font-size: 18px;", "line-height: 16px;"], firstServiceTablet);
+  assertBlockDeclarations(".service-description {", ["font-size: 14px;", "line-height: 21px;"], firstServiceTablet);
+  assertBlockDeclarations(".service-title1 {", ["font-size: 18px;", "line-height: 16px;"], secondServiceTablet);
+  assertBlockDeclarations(".service-description1 {", ["font-size: 14px;", "line-height: 21px;"], secondServiceTablet);
+  assertBlockDeclarations(".home-header2 {", ["padding-bottom: 64px;"], mobile);
+  assertBlockDeclarations(".home-store-badge {", ["height: 48px;"], mobile);
 });
 
 test("Our Apps has desktop, responsive, and focus styles", () => {
